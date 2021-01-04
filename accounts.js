@@ -5,16 +5,15 @@ const FILE = "./accounts.json";
 function saveAccount(account) {
   let accounts = [];
   if (existsSync(FILE)) {
-    accounts = JSON.parse(readFileSync(FILE))
+    accounts = JSON.parse(readFileSync(FILE));
   }
 
-  accounts.push(account)
+  accounts.push(account);
   writeFileSync(FILE, JSON.stringify(accounts));
 }
 
 function generateUsername() {
-  const username =
-    randWord() + "_" + randWord() + "_" + randWord() + "_" + String(Math.random()).split(".")[1].substr(0, 4);
+  const username = randWord() + "_" + randWord() + "_" + randWord() + randomNumbers();
   if (username.length > 20) {
     return username.substr(0, 20);
   } else {
@@ -23,18 +22,26 @@ function generateUsername() {
 }
 
 function generateEmail(uname) {
-  return uname + "@aol.com"
+  return uname + "@aol.com";
 }
 
 function generatePassword() {
-  return randWord() + "_" + randWord() + "_" + randWord()
+  return randWord() + "_" + randWord() + "_" + randWord();
 }
 
 function randWord() {
   const LINE_COUNT = words.length;
   const lineNum = Math.floor(Math.random() * LINE_COUNT);
+  const word = words[lineNum];
+  if (word.length > 5) {
+    return word.substr(0, 5);
+  } else {
+    return word;
+  }
+}
 
-  return words[lineNum];
+function randomNumbers() {
+  return String(Math.random()).split(".")[1].substr(0, 3);
 }
 
 module.exports = {
