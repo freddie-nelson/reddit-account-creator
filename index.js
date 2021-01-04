@@ -1,6 +1,9 @@
 const puppeteer = require("puppeteer-extra");
 const pluginStealth = require("puppeteer-extra-plugin-stealth");
 
+const Logger = require("./Logger.js");
+const logger = new Logger();
+
 const solve = require("puppeteer-recaptcha-solver");
 const accounts = require("./accounts.js");
 
@@ -14,9 +17,10 @@ const ACCOUNT = {
 async function run(proxyPort) {
   puppeteer.use(pluginStealth());
 
-  console.log("STARTING BROWSER...");
+  logger.log("STARTING BROWSER...");
   const browser = await puppeteer.launch({
     headless: true,
+    // executablePath: "/usr/bin/chromium-browser",
     args: [
       "--window-size=500,700",
       // "--window-position=000,000",
@@ -28,22 +32,34 @@ async function run(proxyPort) {
     ],
   });
 
-  console.log("NAVIGATION TO https://old.reddit.com/register#content...");
+  logger.log("NAVIGATION TO https://old.reddit.com/register#content...");
   const page = await browser.newPage();
-  await page.goto("https://old.reddit.com/register#content");
-
-  console.log("FILLING OUT REGISTRATION FORM...");
-  await fillForm(page);
-
-  console.log("ATTEMPTING TO SOLVE CATPCHA...");
   try {
-    await solve(page);
-    console.log("CAPTCHA SOLVE SUCCESSFUL");
-  } catch {
-    console.log("POTENTIAL SOLVE ERROR");
+    await page.goto("https://old.reddit.com/register#content");
+  } catch (err) {
+    logger.log("ERROR: FAILED TO NAVIGATE TO URL");
+    logger.log(err);
+    return;
   }
 
-  console.log("ATTEMPTING ACCOUNT CREATION...");
+  logger.log("FILLING OUT REGISTRATION FORM...");
+  try {
+    await fillForm(page);
+  } catch (err) {
+    logger.log("ERROR: FAILED WHILE FILLING OUT REGESTRATION FORM");
+    logger.log(err);
+    return;
+  }
+
+  logger.log("ATTEMPTING TO SOLVE CATPCHA...");
+  try {
+    await solve(page);
+    logger.log("CAPTCHA SOLVE SUCCESSFUL");
+  } catch {
+    logger.log("POTENTIAL SOLVE ERROR");
+  }
+
+  logger.log("ATTEMPTING ACCOUNT CREATION...");
   let success = true;
   try {
     await Promise.all([
@@ -69,13 +85,13 @@ async function run(proxyPort) {
 
   // save account details
   if (success) {
-    console.log("ACCOUNT CREATION SUCCESSFUL. SAVING ACCOUNT DETAILS...");
+    logger.log("ACCOUNT CREATION SUCCESSFUL. SAVING ACCOUNT DETAILS...");
     accounts.saveAccount({ ...ACCOUNT, success: success });
   }
 
-  // console.log("RATELIMIT: " + ratelimit);
-  console.log("SUCCESS: " + success);
-  console.log("DONE");
+  // logger.log("RATELIMIT: " + ratelimit);
+  logger.log("SUCCESS: " + success);
+  logger.log("DONE");
   browser.close();
   process.exit();
 }
@@ -104,7 +120,7 @@ async function fillForm(page) {
 }
 
 process.on("SIGINT", () => {
-  console.log("bye!");
+  logger.log("bye!");
   process.exit();
 });
 
