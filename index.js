@@ -66,6 +66,7 @@ async function run(proxyPort) {
     submitBtn.click();
   });
   await page.waitForTimeout(10000);
+  await page.screenshot({ path: "./" + Date.now() + ".jpg", type: "jpeg" });
 
   const domain = await page.evaluate(() => {
     return window.location.href;
