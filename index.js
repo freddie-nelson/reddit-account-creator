@@ -60,17 +60,18 @@ async function run(proxyPort) {
   }
 
   logger.log("ATTEMPTING ACCOUNT CREATION...");
-  let success = true;
-  try {
-    await Promise.all([
-      page.waitForNavigation(),
-      page.evaluate(() => {
-        const submitBtn = document.querySelector("#register-form button[type='submit']");
-        submitBtn.click();
-      }),
-    ]);
-  } catch {
-    success = false;
+  let success = false;
+  await page.evaluate(() => {
+    const submitBtn = document.querySelector("#register-form button[type='submit']");
+    submitBtn.click();
+  });
+  await page.waitForTimeout(10000);
+
+  const domain = await page.evaluate(() => {
+    return window.location.href;
+  });
+  if (domain === "https://old.reddit.com") {
+    success = true;
   }
 
   // check for rate limit
