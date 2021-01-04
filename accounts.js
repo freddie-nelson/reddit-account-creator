@@ -13,7 +13,7 @@ function saveAccount(account) {
 }
 
 function generateUsername() {
-  const username = randWord() + "_" + randWord() + "_" + randWord() + randomNumbers();
+  const username = randomNumbers() + randWord() + randWord() + randomNumbers();
   if (username.length > 20) {
     return username.substr(0, 20);
   } else {
@@ -26,15 +26,15 @@ function generateEmail(uname) {
 }
 
 function generatePassword() {
-  return randWord() + "_" + randWord() + "_" + randWord();
+  return randWord() + randWord() + randWord();
 }
 
 function randWord() {
   const LINE_COUNT = words.length;
   const lineNum = Math.floor(Math.random() * LINE_COUNT);
   const word = words[lineNum];
-  if (word.length > 5) {
-    return word.substr(0, 5);
+  if (word.length > 7) {
+    return word.substr(0, 7);
   } else {
     return word;
   }
