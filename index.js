@@ -70,7 +70,7 @@ async function run(proxyPort) {
   const domain = await page.evaluate(() => {
     return window.location.href;
   });
-  if (domain === "https://old.reddit.com") {
+  if (domain === "https://old.reddit.com/") {
     success = true;
   }
 
